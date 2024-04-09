@@ -17,7 +17,7 @@ class ApiUserController extends Controller
     {
         return response()->json([
             'status'=>true,
-            'posts'=>User::orderBy('id')->get()
+            'users'=>User::orderBy('id')->get()
         ],200);
     }
 
@@ -29,11 +29,16 @@ class ApiUserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $user = User::create($request->all());
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->token = str_shuffle("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz0123456789");
+        $user->save();
         return response()->json([
             'status'=>true,
             'message'=>'User Created successfully!',
-            'users'=>$user
+            'data'=>$user
         ],201);
     }
 
@@ -46,7 +51,7 @@ class ApiUserController extends Controller
     public function show(User $user)
     {
         return response()->json([
-            'message'=>'user found successfully!',
+            'message'=>'User found successfully!',
             'users'=>$user,
         ],200);
     }
@@ -60,7 +65,12 @@ class ApiUserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $user->update($request->all());
+        return response()->json([
+            'status'=>true,
+            'message'=> 'User updated successfully!',
+            'data'=>$user
+        ],200);
     }
 
     /**
@@ -71,6 +81,10 @@ class ApiUserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return response()->json([
+            'status'=>true,
+            'message'=> 'User deleted successfully!'
+        ],200);
     }
 }
